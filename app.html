@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Argo Meter</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Argo Meter">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-body">
+
+<div class="phone-frame">
+<div class="app-shell">
+
+  <!-- ============ TAB: BERANDA ============ -->
+  <section class="tab-panel active" id="tab-beranda">
+    <header class="app-topbar">
+      <button class="user-header" id="userHeaderBtn">
+        <div class="user-avatar-sm" id="berandaAvatar">?</div>
+        <div class="user-header-text">
+          <p class="user-name-line" id="berandaUserName">Driver</p>
+          <p class="user-date-line" id="berandaDate">—</p>
+        </div>
+      </button>
+      <button class="bell-btn" id="bellBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="bell-dot" id="bellDot" style="display:none"></span>
+      </button>
+    </header>
+
+    <!-- Period filter -->
+    <div class="period-filter">
+      <button class="period-nav-btn" id="periodPrevBtn">‹</button>
+      <div class="period-tabs">
+        <button class="period-tab active" data-period="day">Hari Ini</button>
+        <button class="period-tab" data-period="week">Minggu Ini</button>
+        <button class="period-tab" data-period="month">Bulan Ini</button>
+      </div>
+      <button class="period-nav-btn" id="periodNextBtn">›</button>
+      <button class="period-nav-btn" id="periodCustomBtn" title="Pilih rentang tanggal">📅</button>
+    </div>
+    <p class="period-label" id="periodLabel">Hari ini</p>
+
+    <!-- Net income hero card -->
+    <section class="net-hero">
+      <div class="net-label-row">
+        <p class="net-label">Pendapatan</p>
+        <span class="trend-badge" id="trendBadge">—</span>
+      </div>
+      <h1 class="net-amount" id="netToday">Rp 0</h1>
+    </section>
+
+    <!-- Platform breakdown -->
+    <div class="platform-breakdown" id="platformBreakdown"></div>
+
+    <!-- Quick actions -->
+    <section class="quick-add">
+      <button class="add-btn income-btn" id="goToIncomeBtn">
+        <span class="add-icon">+</span> Catat Pendapatan
+      </button>
+      <button class="add-btn expense-btn-sm" id="goToExpenseBtn">
+        − Keluar
+      </button>
+    </section>
+
+    <!-- Expense + tip -->
+    <div class="mini-stat-row">
+      <div class="mini-stat">
+        <p class="mini-stat-label">↓ Pengeluaran</p>
+        <p class="mini-stat-value expense" id="expenseToday">Rp 0</p>
+      </div>
+      <div class="mini-stat">
+        <p class="mini-stat-label">🎁 Tip Customer</p>
+        <p class="mini-stat-value tip" id="tipToday">Rp 0</p>
+      </div>
+    </div>
+
+    <!-- Target gauges -->
+    <section class="gauge-section">
+      <div class="gauge-card">
+        <svg viewBox="0 0 200 120" class="gauge-svg-sm">
+          <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-track" pathLength="100"/>
+          <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-fill" id="gaugeDailyFill" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+        </svg>
+        <p class="gauge-title">Target Harian</p>
+        <p class="gauge-value" id="gaugeDailyText">Rp 0 / Rp 100.000</p>
+      </div>
+      <div class="gauge-card">
+        <svg viewBox="0 0 200 120" class="gauge-svg-sm">
+          <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-track" pathLength="100"/>
+          <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-fill accent2" id="gaugeMonthlyFill" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+        </svg>
+        <p class="gauge-title">Target Bulanan</p>
+        <p class="gauge-value" id="gaugeMonthlyText">Rp 0 / Rp 3.000.000</p>
+      </div>
+    </section>
+
+    <!-- 7-day chart -->
+    <section class="chart-section">
+      <div class="chart-header">
+        <h2>7 Hari Terakhir</h2>
+        <input type="date" id="chartDatePicker" class="date-picker">
+      </div>
+      <canvas id="weekChart" height="150"></canvas>
+    </section>
+
+    <!-- Reminders -->
+    <section class="reminder-section" id="reminderSection">
+      <h2>Pengingat</h2>
+      <div class="reminder-list" id="reminderList"></div>
+    </section>
+  </section>
+
+  <!-- ============ TAB: CATAT ============ -->
+  <section class="tab-panel" id="tab-catat">
+    <header class="app-topbar"><h2>Catat Transaksi</h2></header>
+
+    <div class="catat-toggle">
+      <button type="button" class="active" data-type="income" id="toggleIncomeBtn">Pemasukan</button>
+      <button type="button" data-type="expense" id="toggleExpenseBtn">Pengeluaran</button>
+    </div>
+
+    <!-- ===== FORM PEMASUKAN ===== -->
+    <form id="incomeForm" class="catat-form-wrap">
+      <label>Sumber Pendapatan</label>
+      <select id="incPlatform" required></select>
+
+      <label>Pembayaran</label>
+      <div class="segmented" id="incPaymentSeg">
+        <button type="button" class="seg-btn active" data-val="Tunai">Tunai</button>
+        <button type="button" class="seg-btn" data-val="Non-Tunai">Non-Tunai</button>
+      </div>
+
+      <div id="incWalletField" class="field-group" style="display:none">
+        <label>Saldo Masuk Kemana</label>
+        <select id="incWallet"></select>
+      </div>
+
+      <div class="two-col">
+        <div class="field-group">
+          <label>Waktu Penyelesaian (menit)</label>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="incDuration" placeholder="Opsional">
+        </div>
+        <div class="field-group">
+          <label>Jarak (km)</label>
+          <input type="text" inputmode="decimal" id="incDistance" placeholder="Opsional">
+        </div>
+      </div>
+      <p class="field-hint" id="incHint">Isi waktu & jarak biar analisis rekomendasi jam ramai makin akurat.</p>
+
+      <label>Nominal Pendapatan</label>
+      <input type="text" inputmode="numeric" id="incAmount" required placeholder="0">
+
+      <label>Tip dari Customer (opsional)</label>
+      <input type="text" inputmode="numeric" id="incTip" placeholder="0">
+
+      <label>Catatan (opsional)</label>
+      <input type="text" id="incNote" placeholder="Contoh: order jauh ke Bogor">
+
+      <button type="submit" class="btn-primary full" id="incSubmitBtn">Simpan Pendapatan</button>
+    </form>
+
+    <!-- ===== FORM PENGELUARAN ===== -->
+    <form id="expenseForm" class="catat-form-wrap" style="display:none">
+      <label>Tujuan Pengeluaran</label>
+      <select id="expCategory" required></select>
+
+      <label>Pembayaran</label>
+      <select id="expWallet" required></select>
+
+      <label>Nominal</label>
+      <input type="text" inputmode="numeric" id="expAmount" required placeholder="0">
+
+      <label>Catatan (opsional)</label>
+      <input type="text" id="expNote" placeholder="Contoh: isi bensin full tank">
+
+      <button type="submit" class="btn-primary full" id="expSubmitBtn">Simpan Pengeluaran</button>
+    </form>
+  </section>
+
+  <!-- ============ TAB: DOMPET ============ -->
+  <section class="tab-panel" id="tab-dompet">
+    <header class="app-topbar">
+      <h2>Dompet</h2>
+      <button class="bell-btn" id="addWalletBtn" title="Tambah Dompet">+</button>
+    </header>
+
+    <div class="wallet-grid" id="walletGrid"></div>
+
+    <section class="tx-section">
+      <div class="tx-section-header">
+        <h2>Riwayat Transaksi</h2>
+        <button class="link-btn" id="seeAllTxBtn">Lihat semua transaksi</button>
+      </div>
+      <div class="tx-list" id="dompetTxList">
+        <p class="empty-state">Belum ada transaksi.</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ TAB: ANALISIS ============ -->
+  <section class="tab-panel" id="tab-analisis">
+    <header class="app-topbar"><h2>Analisis</h2></header>
+
+    <div class="analisis-period-toggle" id="analisisPeriodToggle">
+      <button class="active" data-p="day">Harian</button>
+      <button data-p="week">Mingguan</button>
+      <button data-p="month">Bulanan</button>
+    </div>
+
+    <div class="free-hero">
+      <p class="fh-label" id="freeHeroLabel">PENDAPATAN BERSIH · HARI INI</p>
+      <span class="fh-trend" id="freeHeroTrend">—</span>
+      <p class="fh-amount" id="freeHeroAmount">Rp 0</p>
+      <div class="fh-sub">
+        <span>Kotor: <b id="freeHeroKotor">Rp 0</b></span>
+        <span>Operasional: <b id="freeHeroOperasional">Rp 0</b></span>
+      </div>
+    </div>
+
+    <div class="free-box-row">
+      <div class="free-box">
+        <span class="fb-tag">GRATIS</span>
+        <p class="fb-title">Margin Bersih</p>
+        <svg viewBox="0 0 100 60" class="margin-gauge-svg">
+          <path d="M 10 55 A 40 40 0 0 1 90 55" class="gauge-track" pathLength="100" stroke-width="8" fill="none"/>
+          <path d="M 10 55 A 40 40 0 0 1 90 55" class="gauge-fill" id="marginGaugeFill" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" stroke-width="8" fill="none"/>
+        </svg>
+        <p class="margin-gauge-pct" id="marginGaugePct">0%</p>
+        <p class="margin-gauge-sub" id="marginGaugeSub">Belum ada data</p>
+      </div>
+      <div class="free-box">
+        <span class="fb-tag">GRATIS</span>
+        <p class="fb-title">Jam Tersibuk</p>
+        <div class="busy-hours-mini" id="busyHoursMini"></div>
+        <p class="busy-hours-text" id="busyHoursText">Belum ada data</p>
+      </div>
+    </div>
+
+    <div class="feature-list" id="featureList"></div>
+
+    <div class="analisis-cta" id="analisisCta">
+      <button id="ctaUpgradeBtn">Buka Semua Analisis — Rp 10.000/bulan</button>
+      <p>Berlaku 31 hari sejak aktivasi</p>
+    </div>
+
+    <div class="detail-section" id="detailSection" style="display:none">
+      <h3>Laporan Lengkap</h3>
+      <div class="reco-banner" id="recoBanner" style="display:none"></div>
+
+      <div class="analytics-controls">
+        <div class="segmented" id="analyticsModeSeg" style="flex:1">
+          <button type="button" class="seg-btn active" data-mode="date">Per Tanggal</button>
+          <button type="button" class="seg-btn" data-mode="month">Per Bulan</button>
+        </div>
+      </div>
+      <div class="analytics-controls">
+        <div id="analyticsDateFields" class="two-col" style="flex:1">
+          <input type="date" id="analyticsStartDate" style="width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 10px;font-size:13px">
+          <input type="date" id="analyticsEndDate" style="width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 10px;font-size:13px">
+        </div>
+        <input type="month" id="analyticsMonthInput" style="display:none;flex:1;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 10px;font-size:13px">
+      </div>
+      <div class="analytics-controls">
+        <select id="analyticsPlatformFilter" style="flex:1">
+          <option value="all">Semua Platform</option>
+        </select>
+        <button class="export-icon-btn" id="exportBtn" title="Export CSV">⬇</button>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box">
+          <p class="stat-label">Pendapatan Bersih (- bensin)</p>
+          <p class="stat-value" id="netAfterFuel">Rp —</p>
+        </div>
+        <div class="stat-box">
+          <p class="stat-label">Estimasi Bensin</p>
+          <p class="stat-value" id="fuelCost">Rp —</p>
+        </div>
+      </div>
+
+      <canvas id="weeklyChart" height="140"></canvas>
+
+      <div class="ranking-section">
+        <h3>Platform Paling Menguntungkan</h3>
+        <div class="ranking-list" id="rankingList"></div>
+      </div>
+
+      <div class="loss-alert" id="lossAlert" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: PROFIL ============ -->
+  <section class="tab-panel" id="tab-profil">
+    <header class="app-topbar"><h2>Profil</h2></header>
+
+    <div class="profile-card">
+      <label class="profile-avatar-wrap" for="avatarInput">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <span class="avatar-edit-badge">✎</span>
+      </label>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none">
+
+      <div class="profile-name-edit">
+        <p class="profile-name" id="profileName">—</p>
+        <button class="icon-btn-sm" id="editNameBtn">✎</button>
+      </div>
+      <p class="profile-email" id="profileEmail">—</p>
+      <span class="profile-status free" id="profileStatus">Free</span>
+      <div class="rank-badge" id="rankBadge" style="display:none"></div>
+    </div>
+
+    <div class="profile-section" id="profileUpgradeSection">
+      <h3>Langganan</h3>
+      <button class="btn-primary full" id="profileUpgradeBtn">Upgrade ke Premium — Rp 10.000/bulan</button>
+    </div>
+
+    <div class="profile-section">
+      <h3>Kendaraan</h3>
+      <div class="vehicle-card" id="vehicleSummary">
+        <p class="empty-state" id="vehicleEmptyText">Belum ada data kendaraan.</p>
+      </div>
+      <button class="btn-secondary full" id="editVehicleBtn">Atur Kendaraan</button>
+    </div>
+
+    <div class="profile-section">
+      <h3>Pengaturan</h3>
+      <div class="profile-row">
+        <label>Mode Gelap</label>
+        <label class="switch">
+          <input type="checkbox" id="themeToggle" checked>
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+      <div class="profile-row">
+        <label>Target Harian (Rp)</label>
+        <input type="text" inputmode="numeric" id="dailyTargetInput">
+      </div>
+      <div class="profile-row">
+        <label>Target Bulanan (Rp)</label>
+        <input type="text" inputmode="numeric" id="monthlyTargetInput">
+      </div>
+      <button class="btn-secondary full" id="saveTargetBtn">Simpan Pengaturan</button>
+    </div>
+
+    <div class="profile-section">
+      <h3>Lainnya</h3>
+      <button class="profile-link-row" id="installBtn">Cara Install Argo Meter <span>›</span></button>
+      <button class="profile-link-row" id="exportDataBtn">Export Data <span>⬇</span></button>
+      <button class="profile-link-row" id="helpBtn">Pusat Bantuan <span>›</span></button>
+      <button class="profile-link-row" id="privacyBtn">Kebijakan Privasi <span>›</span></button>
+      <button class="profile-link-row" id="tosBtn">Ketentuan Layanan <span>›</span></button>
+      <p class="app-version">Argo Meter v1.0.0</p>
+    </div>
+
+    <div class="profile-section">
+      <h3 style="color:var(--expense)">Zona Berbahaya</h3>
+      <button class="profile-link-row danger" id="hapusDataBtn">Hapus Semua Data <span>›</span></button>
+      <button class="profile-link-row danger" id="hapusAkunBtn">Hapus Akun <span>›</span></button>
+    </div>
+
+    <div class="profile-section">
+      <button class="btn-secondary full" id="logoutBtn">Keluar</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-tab="beranda">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    Beranda
+  </button>
+  <button class="nav-item" data-tab="catat">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+    Catat
+  </button>
+  <button class="nav-item" data-tab="dompet">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg>
+    Dompet
+  </button>
+  <button class="nav-item" data-tab="analisis">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+    Analisis
+    <span class="nav-lock-dot" id="navLockDot"></span>
+  </button>
+  <button class="nav-item" data-tab="profil">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+    Profil
+  </button>
+</nav>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-backdrop" id="genericModal">
+  <div class="modal-card" id="genericModalCard">
+    <button class="modal-close" id="genericModalClose">&times;</button>
+    <div id="genericModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="bellPanel">
+  <div class="modal-card">
+    <button class="modal-close" id="bellPanelClose">&times;</button>
+    <h3>Notifikasi</h3>
+    <div id="bellPanelBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="hypeToast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-HMM2hLKgKX_c0E6U"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/constants.js"></script>
+<script src="js/tracker.js"></script>
+<script src="js/beranda.js"></script>
+<script src="js/dompet.js"></script>
+<script src="js/subscription.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/profile.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
+</script>
+</body>
+</html>
