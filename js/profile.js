@@ -82,20 +82,51 @@ document.getElementById('editNameBtn').onclick = () => {
   };
 };
 
-// ===== Upload foto profil (disimpan sebagai data URL di kolom avatar_url) =====
+// ===== Upload foto profil =====
+// Foto dari kamera HP biasanya 2-10MB -- kita terima file segede itu, tapi otomatis
+// dikompres & di-resize di HP kamu dulu sebelum disimpan, biar tetap ringan di database.
 document.getElementById('avatarInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 800 * 1024) { alert('Ukuran foto maksimal 800KB ya, coba pilih foto lain.'); return; }
+  if (file.size > 15 * 1024 * 1024) { alert('Ukuran foto maksimal 15MB ya, coba pilih foto lain.'); return; }
 
-  const reader = new FileReader();
-  reader.onload = async () => {
-    const dataUrl = reader.result;
-    const { error } = await supabaseClient.from('profiles').update({ avatar_url: dataUrl }).eq('id', currentUser.id);
+  try {
+    const compressedDataUrl = await compressImageToDataUrl(file, 480, 0.82);
+    const { error } = await supabaseClient.from('profiles').update({ avatar_url: compressedDataUrl }).eq('id', currentUser.id);
     if (!error) { await loadProfile(); renderProfileTab(); }
-  };
-  reader.readAsDataURL(file);
+    else { alert('Gagal upload foto. Coba lagi.'); }
+  } catch (err) {
+    console.error(err);
+    alert('Gagal memproses foto. Coba pakai foto lain.');
+  }
 });
+
+// Resize gambar ke maks {maxSize}px (sisi terpanjang) + crop persegi di tengah, lalu compress ke JPEG
+function compressImageToDataUrl(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width - side) / 2;
+        const sy = (img.height - side) / 2;
+        const outSize = Math.min(maxSize, side);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = outSize;
+        canvas.height = outSize;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, outSize, outSize);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 // ===== Kendaraan =====
 function renderVehicleSummary() {

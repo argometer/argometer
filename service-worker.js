@@ -1,4 +1,4 @@
-const CACHE_NAME = 'argometer-v7';
+const CACHE_NAME = 'argometer-v8';
 const SHELL_FILES = [
   'index.html',
   'app.html',

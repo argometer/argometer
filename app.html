@@ -165,14 +165,14 @@
       </div>
 
       <label>Jarak (km)</label>
-      <input type="text" inputmode="decimal" id="incDistance" placeholder="Opsional">
+      <input type="text" id="incDistance" placeholder="Opsional" readonly>
       <p class="field-hint">Isi jarak biar analisis rekomendasi jam ramai makin akurat.</p>
 
       <label>Nominal Pendapatan</label>
       <input type="text" id="incAmount" required placeholder="0" readonly>
 
       <label>Tip dari Customer (opsional)</label>
-      <input type="text" inputmode="numeric" id="incTip" placeholder="0">
+      <input type="text" id="incTip" placeholder="0" readonly>
 
       <button type="submit" class="btn-primary full" id="incSubmitBtn">Simpan Pendapatan</button>
     </form>
@@ -438,17 +438,17 @@
       <button data-key="7">7</button>
       <button data-key="8">8</button>
       <button data-key="9">9</button>
-      <button data-key="000">000</button>
+      <button data-key="dot" id="keypadDotBtn">000</button>
       <button data-key="0">0</button>
       <button data-key="back">⌫</button>
     </div>
-    <button class="btn-primary full" id="keypadConfirm">Simpan</button>
+    <button class="btn-primary full" id="keypadConfirm">Selesai</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-HMM2hLKgKX_c0E6U"></script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="MIDTRANS_CLIENT_KEY_DISINI"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/constants.js"></script>
 <script src="js/tracker.js"></script>
