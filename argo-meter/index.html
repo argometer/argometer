@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Argo Meter — Catat Cuan, Bukan Cuma Narik</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Argo Meter">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<div class="phone-frame">
+
+  <nav class="topnav">
+    <div class="brand"><span class="brand-dot"></span>Argo Meter</div>
+    <button class="btn-ghost" id="navLoginBtn">Masuk</button>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-gauge" aria-hidden="true">
+      <svg viewBox="0 0 200 120" class="gauge-svg">
+        <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-track"/>
+        <path d="M 20 110 A 80 80 0 0 1 138 34" class="gauge-fill"/>
+        <line x1="100" y1="110" x2="150" y2="55" class="gauge-needle"/>
+        <circle cx="100" cy="110" r="6" class="gauge-hub"/>
+      </svg>
+      <div class="gauge-label">Rp 187.500 <span>hari ini</span></div>
+    </div>
+
+    <h1>Tau persis <span class="accent">berapa cuan bersih</span><br>kamu tiap narik.</h1>
+    <p class="hero-sub">Argo Meter catat pemasukan tiap platform dan pengeluaran harian kamu, terus hitung untung bersihnya otomatis — kayak argo, tapi buat dompet kamu.</p>
+
+    <div class="hero-cta">
+      <button class="btn-primary" id="heroRegisterBtn">Mulai Gratis</button>
+      <button class="btn-secondary" id="heroLoginBtn">Sudah punya akun</button>
+    </div>
+  </header>
+
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-num">01</div>
+      <h3>Catat tiap trip</h3>
+      <p>Input pemasukan per platform (Gojek, Grab, Maxim) dan pengeluaran harian dalam hitungan detik.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">02</div>
+      <h3>Lihat untung bersih</h3>
+      <p>Dashboard otomatis hitung selisih pemasukan-pengeluaran, jadi kamu tau beneran cuan atau cuma muter doang.</p>
+    </div>
+    <div class="feature-card premium">
+      <div class="feature-num">P</div>
+      <h3>Analisis Premium</h3>
+      <p>Grafik tren mingguan, perbandingan platform paling untung, rata-rata cuan per jam, dan target harian.</p>
+      <span class="premium-tag">Rp 10.000/bulan</span>
+    </div>
+  </section>
+
+  <footer class="site-footer">Dibuat buat driver, sama driver punya semangat yang sama.</footer>
+
+</div>
+
+<!-- ===== MODAL AUTH ===== -->
+<div class="modal-backdrop" id="authModal">
+  <div class="modal-card">
+    <button class="modal-close" id="modalCloseBtn">&times;</button>
+    <div class="modal-tabs">
+      <button class="tab-btn active" data-tab="login">Masuk</button>
+      <button class="tab-btn" data-tab="register">Daftar</button>
+    </div>
+
+    <form id="loginForm" class="auth-form active">
+      <label>Email</label>
+      <input type="email" id="loginEmail" required placeholder="email@kamu.com">
+      <label>Password</label>
+      <input type="password" id="loginPassword" required placeholder="••••••••">
+      <p class="form-error" id="loginError"></p>
+      <button type="submit" class="btn-primary full">Masuk</button>
+    </form>
+
+    <form id="registerForm" class="auth-form">
+      <label>Nama</label>
+      <input type="text" id="registerName" required placeholder="Nama kamu">
+      <label>Email</label>
+      <input type="email" id="registerEmail" required placeholder="email@kamu.com">
+      <label>Password</label>
+      <input type="password" id="registerPassword" required placeholder="Minimal 6 karakter" minlength="6">
+      <p class="form-error" id="registerError"></p>
+      <button type="submit" class="btn-primary full">Daftar Gratis</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
+</script>
+</body>
+</html>
