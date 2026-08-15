@@ -31,7 +31,14 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
   const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
   if (error) {
-    errEl.textContent = 'Email atau password salah.';
+    console.error('Login error:', error); // buka Inspect > Console buat lihat detail aslinya
+    if (error.message.includes('Invalid login credentials')) {
+      errEl.textContent = 'Email atau password salah.';
+    } else if (error.message.includes('Email not confirmed')) {
+      errEl.textContent = 'Email belum dikonfirmasi. Cek inbox/spam kamu dulu.';
+    } else {
+      errEl.textContent = `Gagal masuk: ${error.message}`;
+    }
     return;
   }
   window.location.href = 'app.html';
@@ -67,6 +74,12 @@ registerForm.addEventListener('submit', async (e) => {
 
 // ===== Redirect kalau sudah login =====
 (async () => {
+  const splash = document.getElementById('splashScreen');
+  const hide = () => splash && splash.classList.add('hide');
+  setTimeout(hide, 2500); // pengaman
+
   const { data: { session } } = await supabaseClient.auth.getSession();
-  if (session) window.location.href = 'app.html';
+  if (session) { window.location.href = 'app.html'; return; }
+
+  setTimeout(hide, 500); // beri jeda dikit biar animasi sempat kelihatan
 })();

@@ -2,6 +2,14 @@ let currentUser = null;
 let currentProfile = null;
 let allTransactions = [];
 
+// ===== Splash screen: minimal 900ms biar animasinya kelihatan, tapi nggak lama-lama =====
+const splashMinTime = new Promise(resolve => setTimeout(resolve, 900));
+function hideSplash() {
+  const splash = document.getElementById('splashScreen');
+  if (splash) splash.classList.add('hide');
+}
+setTimeout(hideSplash, 4000); // pengaman: paksa hilang maksimal 4 detik apapun yang terjadi
+
 // ===== Auth guard =====
 (async () => {
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -15,6 +23,8 @@ let allTransactions = [];
   applyTheme();
   await loadTransactions();
   if (typeof renderProfileTab === 'function') renderProfileTab();
+  await splashMinTime;
+  hideSplash();
 })();
 
 // ===== Bottom nav tab switching =====

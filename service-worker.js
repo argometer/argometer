@@ -1,4 +1,4 @@
-const CACHE_NAME = 'argometer-v5';
+const CACHE_NAME = 'argometer-v6';
 const SHELL_FILES = [
   'index.html',
   'app.html',
@@ -13,6 +13,8 @@ const SHELL_FILES = [
   'js/analysis.js',
   'js/profile.js',
   'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
 ];
 
 self.addEventListener('install', (event) => {

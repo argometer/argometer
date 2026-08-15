@@ -18,6 +18,18 @@
 </head>
 <body class="app-body">
 
+<!-- ============ SPLASH SCREEN ============ -->
+<div class="splash-screen" id="splashScreen">
+  <svg class="splash-gauge" viewBox="0 0 140 140">
+    <circle class="splash-gauge-track" cx="70" cy="70" r="40"/>
+    <circle class="splash-gauge-fill" cx="70" cy="70" r="40" transform="rotate(-90 70 70)"/>
+    <line class="splash-needle" x1="70" y1="70" x2="70" y2="30"/>
+    <circle class="splash-hub" cx="70" cy="70" r="6"/>
+  </svg>
+  <p class="splash-wordmark">Argo Meter</p>
+  <p class="splash-tagline">CATAT CUAN, BUKAN CUMA NARIK</p>
+</div>
+
 <div class="phone-frame">
 <div class="app-shell">
 
@@ -414,7 +426,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-HMM2hLKgKX_c0E6U"></script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="MIDTRANS_CLIENT_KEY_DISINI"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/constants.js"></script>
 <script src="js/tracker.js"></script>
