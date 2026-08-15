@@ -80,11 +80,13 @@ const CUSTOM_WALLET_COLORS = ['#F2A93B', '#4F9BFF', '#A6E22E', '#F6821F', '#FF6B
 
 function getAllWallets() {
   const custom = currentProfile?.custom_wallets || [];
-  return [...WALLETS, ...custom];
+  const hidden = currentProfile?.hidden_wallets || [];
+  return [...WALLETS, ...custom].filter(w => !hidden.includes(w));
 }
 function getAllWalletsWithCash() {
   const custom = currentProfile?.custom_wallets || [];
-  return [...WALLETS_WITH_CASH.slice(0, -1), ...custom, 'Tunai'];
+  const hidden = currentProfile?.hidden_wallets || [];
+  return [...WALLETS_WITH_CASH.slice(0, -1), ...custom, 'Tunai'].filter(w => !hidden.includes(w));
 }
 function walletMeta(name) {
   if (WALLET_META[name]) return WALLET_META[name];

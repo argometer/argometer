@@ -1,0 +1,35 @@
+<div style="max-width:480px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;background:#F5F3EE;padding:32px 24px;border-radius:16px">
+
+  <div style="text-align:center;margin-bottom:24px">
+    <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#F2A93B;margin-right:6px;vertical-align:middle"></span>
+    <span style="font-size:20px;font-weight:700;color:#14171C;vertical-align:middle">Argo Meter</span>
+  </div>
+
+  <h2 style="color:#14171C;font-size:20px;text-align:center;margin-bottom:12px">
+    Konfirmasi Pendaftaran Kamu
+  </h2>
+
+  <p style="color:#4B5563;font-size:14px;line-height:1.6;text-align:center;margin-bottom:28px">
+    Makasih udah daftar di Argo Meter! Satu langkah lagi biar akun kamu aktif —
+    klik tombol di bawah ini buat konfirmasi email kamu.
+  </p>
+
+  <div style="text-align:center;margin-bottom:28px">
+    <a href="{{ .ConfirmationURL }}"
+       style="display:inline-block;background:linear-gradient(135deg,#FFCB57,#F2A93B,#D98B1F);
+              color:#14171C;text-decoration:none;font-weight:700;font-size:15px;
+              padding:14px 36px;border-radius:999px">
+      Konfirmasi Email Saya
+    </a>
+  </div>
+
+  <p style="color:#9CA3AF;font-size:12px;text-align:center;line-height:1.5">
+    Kalau tombolnya nggak bisa diklik, copy-paste link ini ke browser kamu:<br>
+    <a href="{{ .ConfirmationURL }}" style="color:#F2A93B;word-break:break-all">{{ .ConfirmationURL }}</a>
+  </p>
+
+  <p style="color:#9CA3AF;font-size:11px;text-align:center;margin-top:24px">
+    Kalau kamu nggak merasa daftar di Argo Meter, abaikan aja email ini.
+  </p>
+
+</div>

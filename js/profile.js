@@ -268,6 +268,24 @@ document.getElementById('helpBtn').onclick = () => {
   `);
 };
 
+document.getElementById('howToUseBtn').onclick = () => {
+  openGenericModal(`
+    <h3>Cara Menggunakan Argo Meter</h3>
+    <div class="policy-text">
+      <h4>🏠 Beranda</h4>
+      <p>Lihat ringkasan pendapatan bersih hari ini/minggu/bulan, target harian & bulanan, dan grafik 7 hari terakhir.</p>
+      <h4>➕ Catat</h4>
+      <p>Setiap selesai narik, catat pendapatannya di sini — pilih platform, waktu narik, jarak (opsional), dan nominal. Jangan lupa catat pengeluaran (bensin, makan, dll) juga biar hitungan bersihnya akurat.</p>
+      <h4>👛 Dompet</h4>
+      <p>Lihat saldo per metode bayar (Tunai, Gopay, dll) dan riwayat transaksi. Bisa tambah dompet baru, atau geser ke kiri buat hapus dompet yang nggak dipakai.</p>
+      <h4>📊 Analisis</h4>
+      <p>Fitur premium buat lihat tren pendapatan, platform paling untung, ke mana uangmu bocor, dan rekomendasi jam ramai berdasarkan data kamu sendiri.</p>
+      <h4>👤 Profil</h4>
+      <p>Atur nama, foto, kendaraan (buat hitung estimasi bensin), target, dan mode tampilan.</p>
+    </div>
+  `);
+};
+
 document.getElementById('installBtn').onclick = () => {
   openGenericModal(`
     <h3>Cara Install Argo Meter</h3>

@@ -123,10 +123,20 @@ document.querySelectorAll('#incPaymentSeg .seg-btn').forEach(btn => {
 
 // ===== Format Rupiah live saat mengetik nominal =====
 ['incAmount', 'incTip', 'expAmount'].forEach(id => formatRupiahLive(document.getElementById(id)));
-document.getElementById('incDuration').addEventListener('input', (e) => { e.target.value = onlyDigits(e.target.value); });
 document.getElementById('incDistance').addEventListener('input', (e) => {
   e.target.value = e.target.value.replace(/[^0-9.,]/g, '');
 });
+
+// ===== Stepper Waktu Narik =====
+let incHourValue = new Date().getHours(); // 0-23
+
+function renderIncHour() {
+  const label = incHourValue === 0 ? 24 : incHourValue;
+  document.getElementById('incTimeDisplay').textContent = `${String(label).padStart(2, '0')}.00`;
+}
+document.getElementById('incTimeMinus').onclick = () => { incHourValue = (incHourValue + 23) % 24; renderIncHour(); };
+document.getElementById('incTimePlus').onclick = () => { incHourValue = (incHourValue + 1) % 24; renderIncHour(); };
+renderIncHour();
 
 // ===== Submit: Pemasukan =====
 document.getElementById('incomeForm').addEventListener('submit', async (e) => {
@@ -137,8 +147,11 @@ document.getElementById('incomeForm').addEventListener('submit', async (e) => {
 
   const payment_method = document.querySelector('#incPaymentSeg .seg-btn.active').dataset.val;
   const wallet = payment_method === 'Non-Tunai' ? document.getElementById('incWallet').value : 'Tunai';
-  const durationRaw = document.getElementById('incDuration').value;
   const distanceRaw = document.getElementById('incDistance').value;
+
+  // Waktu narik yang dipilih user, tanggal hari ini jam sesuai stepper
+  const chosenTime = new Date();
+  chosenTime.setHours(incHourValue, 0, 0, 0);
 
   btn.disabled = true;
   btn.textContent = 'Menyimpan...';
@@ -150,11 +163,10 @@ document.getElementById('incomeForm').addEventListener('submit', async (e) => {
     platform: document.getElementById('incPlatform').value,
     payment_method,
     wallet,
-    duration_minutes: durationRaw ? Number(durationRaw) : null,
     distance_km: distanceRaw ? Number(distanceRaw.replace(',', '.')) : null,
     amount,
     tip_amount: Number(onlyDigits(document.getElementById('incTip').value)) || 0,
-    note: document.getElementById('incNote').value || null,
+    created_at: chosenTime.toISOString(),
   };
 
   const { error } = await supabaseClient.from('transactions').insert(payload);
@@ -166,6 +178,8 @@ document.getElementById('incomeForm').addEventListener('submit', async (e) => {
   document.getElementById('incomeForm').reset();
   document.querySelectorAll('#incPaymentSeg .seg-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
   document.getElementById('incWalletField').style.display = 'none';
+  incHourValue = new Date().getHours();
+  renderIncHour();
 
   await loadTransactions();
   showToast(randomHype(HYPE_INCOME));
@@ -190,7 +204,6 @@ document.getElementById('expenseForm').addEventListener('submit', async (e) => {
     payment_method: wallet,
     wallet,
     amount,
-    note: document.getElementById('expNote').value || null,
   };
 
   const { error } = await supabaseClient.from('transactions').insert(payload);

@@ -116,3 +116,8 @@ alter table profiles add column if not exists fuel_efficiency_km_per_liter numer
 -- FASE 3
 -- ============================================
 alter table profiles add column if not exists custom_wallets jsonb default '[]'::jsonb;
+
+-- ============================================
+-- FASE 4
+-- ============================================
+alter table profiles add column if not exists hidden_wallets jsonb default '[]'::jsonb;

@@ -908,3 +908,23 @@ body.light-mode .modal-backdrop { background: #0A0C10aa; }
 
 .detail-section { padding: 0 20px; }
 .detail-section h3 { font-size: 14px; margin: 20px 0 10px; }
+
+/* ============ Swipe-to-delete Dompet ============ */
+.wallet-swipe-wrap { position: relative; overflow: hidden; border-radius: 12px; }
+.wallet-swipe-delete {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 76px;
+  background: linear-gradient(135deg, #FF8577, #E14E3E);
+  color: #fff; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.wallet-swipeable { touch-action: pan-y; cursor: grab; user-select: none; }
+.wallet-swipeable:active { cursor: grabbing; }
+
+/* ============ Waktu Narik stepper ============ */
+.time-stepper { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 6px 0; }
+.time-stepper button {
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text); font-size: 18px; font-weight: 700; cursor: pointer;
+}
+.time-stepper .time-display { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; min-width: 84px; text-align: center; }
