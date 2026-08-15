@@ -220,18 +220,36 @@ function renderReminders() {
   const hour = new Date().getHours();
   const reminders = [];
 
+  // ===== Pengingat kontekstual (waktu & data) - prioritas utama =====
   if (hour >= 12 && hour < 14) reminders.push({ icon: '🍚', text: 'Waktunya makan siang — jangan dilewatin, biar tenaga tetap oke buat narik sore.' });
   if (hour >= 16 && hour < 18) reminders.push({ icon: '☕', text: 'Sore-sore gini enaknya istirahat sebentar sambil ngopi, isi ulang energi.' });
   if (hour >= 21 || hour < 5) reminders.push({ icon: '😴', text: 'Udah malam, jangan lupa istirahat cukup ya. Kesehatan nomor satu.' });
 
-  // Estimasi servis berdasarkan total jarak tercatat (asumsi servis tiap 2000 km)
   const totalKm = allTransactions.filter(t => t.type === 'income' && t.distance_km).reduce((s, t) => s + Number(t.distance_km), 0);
   const kmToService = 2000 - (totalKm % 2000);
   if (kmToService <= 200) {
     reminders.push({ icon: '🔧', text: `Servis/ganti oli kira-kira ${Math.round(kmToService)} km lagi. Siapin waktu ya.` });
   }
 
-  reminders.push({ icon: '🛢️', text: 'Ingat: cek tekanan angin ban tiap minggu biar bensin lebih irit.' });
+  // ===== Pool pengingat umum, dipilih acak biar nggak itu-itu aja tiap dibuka =====
+  const GENERAL_TIPS = [
+    { icon: '🛢️', text: 'Cek tekanan angin ban tiap minggu biar bensin lebih irit dan berkendara lebih stabil.' },
+    { icon: '🛞', text: 'Perhatikan kondisi ban — kalau alurnya udah tipis, mending ganti sebelum musim hujan.' },
+    { icon: '🧴', text: 'Oli mesin idealnya diganti tiap 2.000-4.000 km, tergantung jenis oli yang dipakai.' },
+    { icon: '🪛', text: 'Servis rutin bulanan bantu deteksi masalah kecil sebelum jadi kerusakan besar & mahal.' },
+    { icon: '💧', text: 'Jangan lupa minum air putih yang cukup, apalagi kalau narik seharian di bawah terik.' },
+    { icon: '🧘', text: 'Sesekali berhenti sejenak buat peregangan badan, biar nggak pegal-pegal abis narik lama.' },
+    { icon: '😊', text: 'Senyum dan sapaan ramah ke penumpang bisa naikin rating & peluang tip lho.' },
+    { icon: '🪖', text: 'Pastikan helm & jaket selalu dipakai dengan benar — keselamatan di jalan itu prioritas.' },
+    { icon: '🔋', text: 'Cek kondisi aki motor secara berkala, apalagi kalau motor sering dipakai starter elektrik.' },
+    { icon: '🌧️', text: 'Kalau cuaca lagi nggak menentu, siapin jas hujan di jok biar nggak kehujanan pas order dadakan.' },
+    { icon: '📱', text: 'Pastikan HP kamu terisi penuh sebelum mulai narik, biar nggak mati di tengah jalan.' },
+    { icon: '🗺️', text: 'Kenali rute alternatif di area kamu, bisa bantu hindari macet dan hemat waktu antar.' },
+  ];
+
+  const shuffled = [...GENERAL_TIPS].sort(() => Math.random() - 0.5);
+  const remainingSlots = Math.max(0, 4 - reminders.length);
+  reminders.push(...shuffled.slice(0, remainingSlots));
 
   document.getElementById('reminderList').innerHTML = reminders.map(r => `
     <div class="reminder-card"><span class="r-icon">${r.icon}</span><span>${r.text}</span></div>

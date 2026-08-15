@@ -94,17 +94,27 @@ function renderBusyHours() {
 
   const max = Math.max(...buckets, 1);
   const container = document.getElementById('busyHoursMini');
+  const labelsContainer = document.getElementById('busyHoursLabels');
   const peakIdx = buckets.indexOf(Math.max(...buckets));
 
   container.innerHTML = buckets.map((v, i) => `
     <div class="bar ${v === max && v > 0 ? 'peak' : ''}" style="height:${Math.max(6, (v / max) * 44)}px"></div>
   `).join('');
 
+  // Label jam di bawah tiap bar ke-2 (00, 04, 08, 12, 16, 20) biar nggak sesak tapi tetap kebaca
+  if (labelsContainer) {
+    labelsContainer.innerHTML = buckets.map((_, i) => {
+      const hourLabel = i % 2 === 0 ? String(i * 2).padStart(2, '0') : '';
+      return `<span class="busy-hour-tick">${hourLabel}</span>`;
+    }).join('');
+  }
+
   const textEl = document.getElementById('busyHoursText');
   if (incomeTx.length < 3) {
     textEl.textContent = 'Belum cukup data';
   } else {
-    textEl.textContent = `Puncak jam ${peakIdx * 2}–${peakIdx * 2 + 2}`;
+    const fmtHour = (h) => `${String(h).padStart(2, '0')}.00`;
+    textEl.textContent = `Puncak jam ${fmtHour(peakIdx * 2)}–${fmtHour(peakIdx * 2 + 2)}`;
   }
 }
 
@@ -113,7 +123,7 @@ const FEATURES = [
   { id: 'trend', icon: '📈', title: 'Tren & Proyeksi Pendapatan', desc: 'Lihat arah pendapatanmu beberapa minggu terakhir dan proyeksi bulan ini kalau ritme narik tetap sama.', type: 'premium' },
   { id: 'ranking', icon: '🏆', title: 'Aplikasi Mana Paling Untung?', desc: 'Bandingkan pendapatan dari Gojek, Grab, Maxim, dan lainnya — biar tau mana yang layak diprioritaskan.', type: 'premium' },
   { id: 'bocor', icon: '🕳️', title: 'Ke Mana Uangmu Bocor?', desc: 'Rincian pengeluaran non-operasional (makan, kopi, dll) plus estimasi tabungan kalau dikurangi 20%.', type: 'premium' },
-  { id: 'compare', icon: '👥', title: 'Posisimu di Antara Driver Lain', desc: 'Bandingkan pendapatanmu (anonim) dengan rata-rata driver lain. Fitur ini sedang kami kembangkan.', type: 'soon' },
+  { id: 'compare', icon: '👥', title: 'Posisimu di Antara Driver Lain', desc: 'Bandingkan rata-rata pendapatan kotor per hari kamu dengan rata-rata semua driver Argo Meter (anonim, cuma angka rata-rata yang ditampilkan).', type: 'premium' },
 ];
 
 function renderFeatureCards() {
@@ -152,6 +162,68 @@ function openFeatureDetail(id) {
   if (id === 'trend') return openTrendModal();
   if (id === 'ranking') return openRankingModal();
   if (id === 'bocor') return openBocorModal();
+  if (id === 'compare') return openCompareModal();
+}
+
+// ===== Detail: Posisi vs Driver Lain =====
+async function openCompareModal() {
+  openGenericModal(`<h3>👥 Posisimu di Antara Driver Lain</h3><p class="policy-text" style="margin-top:14px">Menghitung...</p>`);
+
+  const { data, error } = await supabaseClient.rpc('get_driver_average_stats');
+  if (error || !data || !data.length) {
+    document.getElementById('genericModalBody').innerHTML = `<h3>👥 Posisimu di Antara Driver Lain</h3><p class="policy-text" style="margin-top:14px">Gagal mengambil data pembanding. Coba lagi nanti.</p>`;
+    return;
+  }
+
+  const { avg_daily_income, driver_count } = data[0];
+
+  if (driver_count < 3) {
+    document.getElementById('genericModalBody').innerHTML = `
+      <h3>👥 Posisimu di Antara Driver Lain</h3>
+      <p class="policy-text" style="margin-top:14px">Belum cukup driver lain yang pakai Argo Meter buat bikin perbandingan yang bermakna. Fitur ini bakal makin akurat begitu makin banyak driver gabung. Coba lagi nanti ya!</p>
+    `;
+    return;
+  }
+
+  // Rata-rata pendapatan kotor per hari aktif milik user sendiri
+  const incomeTx = allTransactions.filter(t => t.type === 'income');
+  const byDay = {};
+  incomeTx.forEach(t => {
+    const day = new Date(t.created_at).toDateString();
+    byDay[day] = (byDay[day] || 0) + Number(t.amount);
+  });
+  const days = Object.values(byDay);
+  const myAvg = days.length ? days.reduce((s, v) => s + v, 0) / days.length : 0;
+
+  const diff = myAvg - avg_daily_income;
+  const pct = avg_daily_income > 0 ? Math.round((diff / avg_daily_income) * 100) : 0;
+
+  let message;
+  if (days.length === 0) {
+    message = 'Kamu belum punya catatan pendapatan, jadi belum bisa dibandingkan. Yuk mulai catat dulu!';
+  } else if (pct >= 10) {
+    message = `Kece! Rata-rata pendapatan kotor harian kamu <b>${Math.abs(pct)}% di atas</b> rata-rata driver Argo Meter lainnya. 🔥`;
+  } else if (pct <= -10) {
+    message = `Rata-rata pendapatan kotor harian kamu <b>${Math.abs(pct)}% di bawah</b> rata-rata driver lain. Coba cek tab "Tren & Proyeksi" atau "Rekomendasi jam" buat naikin performa.`;
+  } else {
+    message = `Rata-rata pendapatan kotor harian kamu <b>sekitar sama</b> dengan rata-rata driver Argo Meter lainnya. Solid!`;
+  }
+
+  document.getElementById('genericModalBody').innerHTML = `
+    <h3>👥 Posisimu di Antara Driver Lain</h3>
+    <div class="stat-grid" style="margin-top:14px">
+      <div class="stat-box">
+        <p class="stat-label">Rata-rata kamu / hari</p>
+        <p class="stat-value">${fmtRupiah(myAvg)}</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-label">Rata-rata ${driver_count} driver lain</p>
+        <p class="stat-value">${fmtRupiah(avg_daily_income)}</p>
+      </div>
+    </div>
+    <div class="reco-banner" style="margin-top:14px">${message}</div>
+    <p class="field-hint" style="margin-top:10px">*Dihitung dari pendapatan kotor (belum dipotong bensin), berdasarkan data seluruh pengguna Argo Meter secara anonim.</p>
+  `;
 }
 
 // ===== Detail: Tren & Proyeksi =====
@@ -309,7 +381,6 @@ function renderDetailSection() {
 
   renderRecommendation(incomeTx);
   renderAnalysisChart(range, tx);
-  renderRanking(incomeTx);
   renderLossAlert(incomeTx, efficiency, fuelPrice);
 }
 
@@ -365,34 +436,8 @@ function renderAnalysisChart(range, tx) {
   });
 }
 
-function renderRanking(incomeTx) {
-  const byPlatform = {};
-  incomeTx.forEach(t => {
-    const p = t.platform || 'Lainnya';
-    byPlatform[p] = byPlatform[p] || { total: 0, count: 0 };
-    byPlatform[p].total += Number(t.amount);
-    byPlatform[p].count += 1;
-  });
-  const ranked = Object.entries(byPlatform).sort((a, b) => b[1].total - a[1].total);
-  document.getElementById('rankingList').innerHTML = ranked.map(([name, d], i) => `
-    <button class="ranking-item" data-platform="${name}">
-      <span class="r-rank">#${i + 1}</span>
-      <span class="r-dot" style="background:${platformColor(name)}"></span>
-      <span class="r-name">${name}</span>
-      <span class="r-amount">${fmtRupiah(d.total)} · ${d.count}x</span>
-    </button>
-  `).join('') || '<p class="empty-state">Belum ada data.</p>';
-
-  document.querySelectorAll('#rankingList .ranking-item').forEach(item => {
-    item.onclick = () => {
-      const platform = item.dataset.platform;
-      const platformTx = incomeTx.filter(t => (t.platform || 'Lainnya') === platform);
-      openGenericModal(`<h3>Histori — ${platform}</h3><div class="tx-list" id="platformHistoryList" style="margin-top:14px; max-height:55vh; overflow-y:auto"></div>`);
-      document.getElementById('genericModalCard').classList.add('wide');
-      renderDompetTxList(platformTx, 'platformHistoryList');
-    };
-  });
-}
+// (renderRanking dipakai di modal kartu "Aplikasi Mana Paling Untung?" lewat openRankingModal,
+//  jadi nggak perlu lagi di Laporan Lengkap)
 
 function renderLossAlert(incomeTx, efficiency, fuelPrice) {
   const byPlatform = {};

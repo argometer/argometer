@@ -876,6 +876,8 @@ body.light-mode .modal-backdrop { background: #0A0C10aa; }
 .busy-hours-mini .bar { flex: 1; background: var(--accent); border-radius: 2px 2px 0 0; opacity: .5; }
 .busy-hours-mini .bar.peak { opacity: 1; }
 .busy-hours-text { font-size: 9px; color: var(--text-muted); }
+.busy-hours-labels { display: flex; gap: 2px; margin-bottom: 4px; }
+.busy-hour-tick { flex: 1; font-size: 8px; color: var(--text-muted); text-align: center; }
 
 .feature-list { display: flex; flex-direction: column; gap: 10px; padding: 0 20px 16px; }
 .feature-card {
@@ -970,3 +972,28 @@ body.light-mode .modal-backdrop { background: #0A0C10aa; }
   animation: splashText .5s ease .8s forwards;
 }
 @keyframes splashText { to { opacity: 1; transform: translateY(0); } }
+
+/* ============ Custom Amount Keypad ============ */
+.keypad-backdrop {
+  display: none;
+  position: fixed; inset: 0; z-index: 70;
+  background: #0A0C10cc;
+}
+.keypad-backdrop.open { display: block; }
+.keypad-sheet {
+  position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 30px #000a;
+}
+.keypad-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.keypad-header button { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
+.keypad-display { text-align: center; font-size: 30px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px; }
+.keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.keypad-grid button {
+  padding: 16px 0; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text); font-size: 18px; font-weight: 600; cursor: pointer;
+}
+.keypad-grid button:active { background: var(--accent-dim); }

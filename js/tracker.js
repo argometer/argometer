@@ -131,11 +131,60 @@ document.querySelectorAll('#incPaymentSeg .seg-btn').forEach(btn => {
   };
 });
 
-// ===== Format Rupiah live saat mengetik nominal =====
-['incAmount', 'incTip', 'expAmount'].forEach(id => formatRupiahLive(document.getElementById(id)));
+// ===== Format Rupiah live saat mengetik nominal (Tip masih pakai keyboard biasa) =====
+formatRupiahLive(document.getElementById('incTip'));
 document.getElementById('incDistance').addEventListener('input', (e) => {
   e.target.value = e.target.value.replace(/[^0-9.,]/g, '');
 });
+
+// ===== Custom Amount Keypad (buat Nominal Pendapatan & Pengeluaran) =====
+let keypadDigits = '';
+let keypadTargetInput = null;
+let keypadTargetForm = null;
+
+function openKeypad(targetInputId, targetFormId, title, confirmLabel) {
+  keypadTargetInput = document.getElementById(targetInputId);
+  keypadTargetForm = document.getElementById(targetFormId);
+  keypadDigits = onlyDigits(keypadTargetInput.value) || '';
+  document.getElementById('keypadTitle').textContent = title;
+  document.getElementById('keypadConfirm').textContent = confirmLabel;
+  updateKeypadDisplay();
+  document.getElementById('keypadBackdrop').classList.add('open');
+}
+function closeKeypad() {
+  document.getElementById('keypadBackdrop').classList.remove('open');
+}
+function updateKeypadDisplay() {
+  document.getElementById('keypadDisplay').textContent = fmtRupiah(Number(keypadDigits || '0'));
+}
+
+document.getElementById('incAmount').addEventListener('click', () => openKeypad('incAmount', 'incomeForm', 'Nominal Pendapatan', 'Simpan Pendapatan'));
+document.getElementById('expAmount').addEventListener('click', () => openKeypad('expAmount', 'expenseForm', 'Nominal Pengeluaran', 'Simpan Pengeluaran'));
+document.getElementById('keypadClose').onclick = closeKeypad;
+document.getElementById('keypadBackdrop').addEventListener('click', (e) => { if (e.target.id === 'keypadBackdrop') closeKeypad(); });
+
+document.querySelectorAll('.keypad-grid button').forEach(btn => {
+  btn.onclick = () => {
+    const key = btn.dataset.key;
+    if (key === 'back') {
+      keypadDigits = keypadDigits.slice(0, -1);
+    } else {
+      if (keypadDigits === '0') keypadDigits = '';
+      if ((keypadDigits + key).length <= 9) keypadDigits += key; // batas wajar biar nggak kebablasan
+    }
+    updateKeypadDisplay();
+  };
+});
+
+document.getElementById('keypadConfirm').onclick = () => {
+  if (!keypadDigits || Number(keypadDigits) === 0) {
+    alert('Isi nominalnya dulu ya.');
+    return;
+  }
+  keypadTargetInput.value = Number(keypadDigits).toLocaleString('id-ID');
+  closeKeypad();
+  keypadTargetForm.requestSubmit();
+};
 
 // ===== Stepper Waktu Narik =====
 let incHourValue = new Date().getHours(); // 0-23

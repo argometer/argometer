@@ -169,7 +169,7 @@
       <p class="field-hint">Isi jarak biar analisis rekomendasi jam ramai makin akurat.</p>
 
       <label>Nominal Pendapatan</label>
-      <input type="text" inputmode="numeric" id="incAmount" required placeholder="0">
+      <input type="text" id="incAmount" required placeholder="0" readonly>
 
       <label>Tip dari Customer (opsional)</label>
       <input type="text" inputmode="numeric" id="incTip" placeholder="0">
@@ -186,7 +186,7 @@
       <select id="expWallet" required></select>
 
       <label>Nominal</label>
-      <input type="text" inputmode="numeric" id="expAmount" required placeholder="0">
+      <input type="text" id="expAmount" required placeholder="0" readonly>
 
       <button type="submit" class="btn-primary full" id="expSubmitBtn">Simpan Pengeluaran</button>
     </form>
@@ -247,6 +247,7 @@
         <span class="fb-tag">GRATIS</span>
         <p class="fb-title">Jam Tersibuk</p>
         <div class="busy-hours-mini" id="busyHoursMini"></div>
+        <div class="busy-hours-labels" id="busyHoursLabels"></div>
         <p class="busy-hours-text" id="busyHoursText">Belum ada data</p>
       </div>
     </div>
@@ -294,11 +295,6 @@
       </div>
 
       <canvas id="weeklyChart" height="140"></canvas>
-
-      <div class="ranking-section">
-        <h3>Platform Paling Menguntungkan</h3>
-        <div class="ranking-list" id="rankingList"></div>
-      </div>
 
       <div class="loss-alert" id="lossAlert" style="display:none"></div>
     </div>
@@ -424,9 +420,35 @@
 
 <div class="toast" id="hypeToast"></div>
 
+<!-- ============ CUSTOM AMOUNT KEYPAD ============ -->
+<div class="keypad-backdrop" id="keypadBackdrop">
+  <div class="keypad-sheet">
+    <div class="keypad-header">
+      <span id="keypadTitle">Nominal</span>
+      <button id="keypadClose">&times;</button>
+    </div>
+    <p class="keypad-display" id="keypadDisplay">Rp 0</p>
+    <div class="keypad-grid">
+      <button data-key="1">1</button>
+      <button data-key="2">2</button>
+      <button data-key="3">3</button>
+      <button data-key="4">4</button>
+      <button data-key="5">5</button>
+      <button data-key="6">6</button>
+      <button data-key="7">7</button>
+      <button data-key="8">8</button>
+      <button data-key="9">9</button>
+      <button data-key="000">000</button>
+      <button data-key="0">0</button>
+      <button data-key="back">⌫</button>
+    </div>
+    <button class="btn-primary full" id="keypadConfirm">Simpan</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-HMM2hLKgKX_c0E6U"></script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="MIDTRANS_CLIENT_KEY_DISINI"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/constants.js"></script>
 <script src="js/tracker.js"></script>
