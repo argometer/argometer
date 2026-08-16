@@ -78,9 +78,9 @@ function renderMarginGauge() {
 
   const subEl = document.getElementById('marginGaugeSub');
   if (kotor === 0) subEl.textContent = 'Belum ada data';
-  else if (margin >= 50) subEl.textContent = 'Sehat — di atas rata-rata driver';
-  else if (margin >= 25) subEl.textContent = 'Standar — masih wajar';
-  else subEl.textContent = 'Rendah — bensin makan banyak margin';
+  else if (margin >= 50) subEl.textContent = 'Sehat';
+  else if (margin >= 25) subEl.textContent = 'Standar';
+  else subEl.textContent = 'Rendah';
 }
 
 // ===== Jam Tersibuk mini chart (gratis) =====

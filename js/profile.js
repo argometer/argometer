@@ -173,8 +173,7 @@ document.getElementById('editVehicleBtn').onclick = () => {
     </select>
     <p class="field-hint">Harga bensin dipakai buat hitung estimasi pendapatan bersih di tab Analisis. Bisa disesuaikan manual kalau beda di daerah kamu.</p>
 
-    <label style="display:block;font-size:13px;color:var(--text-muted);margin:12px 0 6px">Konsumsi BBM (km per liter)</label>
-    <input type="text" inputmode="numeric" pattern="[0-9]*" id="vEfficiency" value="${v.fuel_efficiency_km_per_liter || 40}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:10px">
+    <p class="field-hint" style="margin-top:10px">⛽ Konsumsi BBM dihitung otomatis berdasarkan jenis kendaraan (standar industri), nggak perlu diisi manual.</p>
 
     <button class="btn-primary full" id="saveVehicleBtn" style="margin-top:18px">Simpan Kendaraan</button>
   `;
@@ -188,14 +187,17 @@ document.getElementById('editVehicleBtn').onclick = () => {
 
   document.getElementById('saveVehicleBtn').onclick = async () => {
     const fuel_type = document.getElementById('vFuel').value;
+    const vehicle_type = document.getElementById('vType').value;
+    const vehicle_subtype = vehicle_type === 'Motor' ? document.getElementById('vSubtype').value : null;
+
     const payload = {
       vehicle_model: document.getElementById('vModel').value || null,
       vehicle_year: Number(document.getElementById('vYear').value) || null,
-      vehicle_type: document.getElementById('vType').value,
-      vehicle_subtype: document.getElementById('vType').value === 'Motor' ? document.getElementById('vSubtype').value : null,
+      vehicle_type,
+      vehicle_subtype,
       fuel_type,
       fuel_price: fuelPriceMap[fuel_type],
-      fuel_efficiency_km_per_liter: Number(document.getElementById('vEfficiency').value) || 40,
+      fuel_efficiency_km_per_liter: getFuelEfficiencyKmPerLiter(vehicle_type, vehicle_subtype),
     };
     await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
     await loadProfile();

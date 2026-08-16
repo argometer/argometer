@@ -7,7 +7,7 @@ const PLATFORMS = [
   { name: 'Maxim', color: '#FFCC00' },
   { name: 'Indriver', color: '#A6E22E' },
   { name: 'Lalamove', color: '#F6821F' },
-  { name: 'Q Move', color: '#4F9BFF' },
+  { name: 'Q Move', color: '#4fffcd' },
   { name: 'Green SM', color: '#00B074' },
   { name: 'Lainnya', color: '#8B92A1' },
 ];
@@ -77,6 +77,27 @@ const WALLET_META = {
   'Wallet Aplikasi': { color: '#8B92A1' },
 };
 const CUSTOM_WALLET_COLORS = ['#F2A93B', '#4F9BFF', '#A6E22E', '#F6821F', '#FF6B5B'];
+
+// Konsumsi BBM standar (Liter per KM), dipakai buat auto-hitung efisiensi kendaraan
+const FUEL_CONSUMPTION_PER_KM = {
+  'Bebek': 0.020,
+  'Matic': 0.025,
+  'Sport': 0.033,
+  'Mobil': 0.100,
+};
+function getFuelConsumptionKey(vehicleType, vehicleSubtype) {
+  return vehicleType === 'Mobil' ? 'Mobil' : (vehicleSubtype || 'Matic');
+}
+function getFuelEfficiencyKmPerLiter(vehicleType, vehicleSubtype) {
+  const key = getFuelConsumptionKey(vehicleType, vehicleSubtype);
+  const consumption = FUEL_CONSUMPTION_PER_KM[key] || FUEL_CONSUMPTION_PER_KM['Matic'];
+  return 1 / consumption; // konversi ke km/liter, biar kompatibel sama rumus yang udah ada
+}
+
+// ⚠️ SAKLAR PEMBAYARAN — ubah jadi `true` begitu Midtrans udah Production/approved.
+// Selama `false`, tombol Upgrade nunjukin "Segera Hadir" (bukan buka pembayaran beneran),
+// tapi semua fitur GRATIS tetap jalan normal buat publik.
+const PAYMENTS_ENABLED = false;
 
 function getAllWallets() {
   const custom = currentProfile?.custom_wallets || [];

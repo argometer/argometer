@@ -234,13 +234,13 @@ function renderReminders() {
   // ===== Pool pengingat umum, dipilih acak biar nggak itu-itu aja tiap dibuka =====
   const GENERAL_TIPS = [
     { icon: '🛢️', text: 'Cek tekanan angin ban tiap minggu biar bensin lebih irit dan berkendara lebih stabil.' },
-    { icon: '🛞', text: 'Perhatikan kondisi ban — kalau alurnya udah tipis, mending ganti sebelum musim hujan.' },
+    { icon: '🛞', text: 'Perhatikan kondisi ban, kalau sudah tipis, mending ganti sebelum musim hujan.' },
     { icon: '🧴', text: 'Oli mesin idealnya diganti tiap 2.000-4.000 km, tergantung jenis oli yang dipakai.' },
     { icon: '🪛', text: 'Servis rutin bulanan bantu deteksi masalah kecil sebelum jadi kerusakan besar & mahal.' },
     { icon: '💧', text: 'Jangan lupa minum air putih yang cukup, apalagi kalau narik seharian di bawah terik.' },
     { icon: '🧘', text: 'Sesekali berhenti sejenak buat peregangan badan, biar nggak pegal-pegal abis narik lama.' },
     { icon: '😊', text: 'Senyum dan sapaan ramah ke penumpang bisa naikin rating & peluang tip lho.' },
-    { icon: '🪖', text: 'Pastikan helm & jaket selalu dipakai dengan benar — keselamatan di jalan itu prioritas.' },
+    { icon: '🪖', text: 'Pastikan helm & jaket selalu dipakai dengan benar, keselamatan di jalan itu prioritas.' },
     { icon: '🔋', text: 'Cek kondisi aki motor secara berkala, apalagi kalau motor sering dipakai starter elektrik.' },
     { icon: '🌧️', text: 'Kalau cuaca lagi nggak menentu, siapin jas hujan di jok biar nggak kehujanan pas order dadakan.' },
     { icon: '📱', text: 'Pastikan HP kamu terisi penuh sebelum mulai narik, biar nggak mati di tengah jalan.' },

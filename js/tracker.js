@@ -131,73 +131,11 @@ document.querySelectorAll('#incPaymentSeg .seg-btn').forEach(btn => {
   };
 });
 
-// (Jarak, Nominal, Tip sekarang di-handle via custom keypad di bawah, bukan native keyboard)
-
-// ===== Custom Amount Keypad (buat Jarak, Nominal, Tip -- fungsinya cuma isi 1 field, submit tetap lewat tombol form) =====
-let keypadDigits = '';
-let keypadTargetInput = null;
-let keypadMode = 'currency'; // 'currency' (Rp, digit doang) atau 'distance' (km, boleh 1 titik desimal)
-
-function openKeypad(targetInputId, mode, title) {
-  keypadTargetInput = document.getElementById(targetInputId);
-  keypadMode = mode;
-  keypadDigits = mode === 'distance'
-    ? (keypadTargetInput.value || '')
-    : onlyDigits(keypadTargetInput.value);
-
-  document.getElementById('keypadTitle').textContent = title;
-  document.getElementById('keypadDotBtn').textContent = mode === 'distance' ? '.' : '000';
-  document.getElementById('keypadDotBtn').dataset.key = mode === 'distance' ? 'dot' : '000';
-  updateKeypadDisplay();
-  document.getElementById('keypadBackdrop').classList.add('open');
-}
-function closeKeypad() {
-  document.getElementById('keypadBackdrop').classList.remove('open');
-}
-function updateKeypadDisplay() {
-  const display = document.getElementById('keypadDisplay');
-  if (keypadMode === 'distance') {
-    display.textContent = `${keypadDigits || '0'} km`;
-  } else {
-    display.textContent = fmtRupiah(Number(keypadDigits || '0'));
-  }
-}
-
-document.getElementById('incDistance').addEventListener('click', () => openKeypad('incDistance', 'distance', 'Jarak (km)'));
-document.getElementById('incAmount').addEventListener('click', () => openKeypad('incAmount', 'currency', 'Nominal Pendapatan'));
-document.getElementById('incTip').addEventListener('click', () => openKeypad('incTip', 'currency', 'Tip dari Customer'));
-document.getElementById('expAmount').addEventListener('click', () => openKeypad('expAmount', 'currency', 'Nominal Pengeluaran'));
-document.getElementById('keypadClose').onclick = closeKeypad;
-document.getElementById('keypadBackdrop').addEventListener('click', (e) => { if (e.target.id === 'keypadBackdrop') closeKeypad(); });
-
-document.querySelectorAll('.keypad-grid button').forEach(btn => {
-  btn.onclick = () => {
-    const key = btn.dataset.key;
-    if (key === 'back') {
-      keypadDigits = keypadDigits.slice(0, -1);
-    } else if (key === 'dot') {
-      if (!keypadDigits.includes('.')) keypadDigits += (keypadDigits === '' ? '0.' : '.');
-    } else if (key === '000') {
-      if (keypadDigits === '0') keypadDigits = '';
-      if ((keypadDigits + key).length <= 9) keypadDigits += key;
-    } else {
-      if (keypadDigits === '0') keypadDigits = '';
-      if (keypadDigits.length <= 9) keypadDigits += key;
-    }
-    updateKeypadDisplay();
-  };
+// ===== Format Rupiah live saat mengetik nominal =====
+['incAmount', 'incTip', 'expAmount'].forEach(id => formatRupiahLive(document.getElementById(id)));
+document.getElementById('incDistance').addEventListener('input', (e) => {
+  e.target.value = e.target.value.replace(/[^0-9.,]/g, '');
 });
-
-// "Selesai" cuma nyimpen nilai ke field itu & nutup keypad -- BUKAN submit form,
-// biar perilakunya sama kayak keyboard biasa (submit tetap lewat tombol form)
-document.getElementById('keypadConfirm').onclick = () => {
-  if (keypadMode === 'distance') {
-    keypadTargetInput.value = keypadDigits;
-  } else {
-    keypadTargetInput.value = keypadDigits ? Number(keypadDigits).toLocaleString('id-ID') : '';
-  }
-  closeKeypad();
-};
 
 // ===== Stepper Waktu Narik =====
 let incHourValue = new Date().getHours(); // 0-23

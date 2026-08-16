@@ -28,6 +28,15 @@ const PREMIUM_PRICE = 10000;
 const PREMIUM_LABEL = 'Upgrade — Rp 10.000/bulan';
 
 async function startCheckout(btn) {
+  if (!PAYMENTS_ENABLED) {
+    openGenericModal(`
+      <h3>🚀 Segera Hadir</h3>
+      <p class="policy-text">Fitur langganan Premium lagi dalam tahap persiapan akhir. Untuk sementara, semua fitur gratis Argo Meter bisa kamu pakai sepuasnya!</p>
+      <p class="policy-text" style="margin-top:10px">Begitu Premium udah bisa diaktifkan, kami bakal kabarin lewat notifikasi di app ini. Makasih udah sabar menunggu 🙏</p>
+    `);
+    return;
+  }
+
   const originalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Menyiapkan pembayaran...';
@@ -67,3 +76,11 @@ async function startCheckout(btn) {
 
 document.getElementById('ctaUpgradeBtn').onclick = (e) => startCheckout(e.target);
 document.getElementById('profileUpgradeBtn').onclick = (e) => startCheckout(e.target);
+
+// Kalau pembayaran belum aktif, ubah teks tombol biar jujur dari awal (bukan cuma pas diklik)
+if (!PAYMENTS_ENABLED) {
+  const ctaBtn = document.getElementById('ctaUpgradeBtn');
+  const profileBtn = document.getElementById('profileUpgradeBtn');
+  if (ctaBtn) ctaBtn.textContent = '🚀 Premium Segera Hadir';
+  if (profileBtn) profileBtn.textContent = '🚀 Premium Segera Hadir';
+}
